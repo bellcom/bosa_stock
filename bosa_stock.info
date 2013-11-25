@@ -1,0 +1,7 @@
+name = BOSA Stock
+description = Extra stock handling for Drupal Commerce
+core = 7.x
+version = "7.x-0.1-dev"
+package = BOSA
+dependencies[] = commerce
+dependencies[] = commerce_stock

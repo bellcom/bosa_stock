@@ -1,0 +1,84 @@
+<?php
+/**
+ * @file
+ *  bosa_stock.module
+ *
+ *  Extends commerce_stock functionality to handle stock on order
+ *  changes in backend.
+ */
+
+/**
+ * Implements hook_commerce_line_item_update()
+ */
+function bosa_stock_commerce_line_item_update($line_item){
+  // Only do stuff on admin pages
+  // We dont want to mess up stock when the customer updates his cart
+  if(arg(0) == 'admin' || arg(0) == 'system'){
+    // Get quantities
+    $quantity = (int)$line_item->quantity;
+    $old_quanity = (int)$line_item->original->quantity;
+
+    $adjust = $old_quanity - $quantity;
+
+    bosa_stock_update_stock($line_item, $adjust);
+  }
+}
+
+/**
+ * Implements hook_commerce_line_item_insert()
+ */
+function bosa_stock_commerce_line_item_insert($line_item){
+  // Only do stuff on admin pages
+  // We dont want to mess up stock when the customer updates his cart
+  if(arg(0) == 'admin' || arg(0) == 'system'){
+    // Get quantities
+    $quantity = -(int)$line_item->quantity;
+
+    bosa_stock_update_stock($line_item, $quantity);
+  }
+
+}
+
+/**
+ * Implements hook_commerce_line_item_delete()
+ */
+function bosa_stock_commerce_line_item_delete($line_item){
+  // Only do stuff on admin pages
+  // We dont want to mess up stock when the customer updates his cart
+  if(arg(0) == 'admin' || arg(0) == 'system'){
+    // Get quantities
+    $quantity = (int)$line_item->quantity;
+
+    bosa_stock_update_stock($line_item, $quantity);
+  }
+}
+
+/**
+ * Helper function for updating stock
+ *
+ * @params
+ *  object - line item entity
+ *  int - stock adjustment
+ *
+ * @return
+ *  null
+ */
+function bosa_stock_update_stock($line_item, $adjust){
+  // Load product
+  if(!isset($line_item->commerce_product)){
+    return;
+  }
+  $product_id = $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'];
+  $product = commerce_product_load($product_id);
+
+  if(is_object($product) && $adjust !== 0){
+    if(!empty($product->commerce_stock)){
+
+      // Adjust stock and save
+      $product->commerce_stock[LANGUAGE_NONE][0]['value'] += $adjust;
+      commerce_product_save($product);
+
+      drupal_set_message(t('Updated product(SKU): %product_sku, stock with amount: %adjust', array('%product_sku' => $product->sku, '%adjust' => $adjust)));
+    }
+  }
+}
