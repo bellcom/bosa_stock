@@ -13,7 +13,7 @@
 function bosa_stock_commerce_line_item_update($line_item){
   // Only do stuff on admin pages
   // We dont want to mess up stock when the customer updates his cart
-  if(arg(0) == 'admin' || arg(0) == 'system'){
+  if(strstr($_SERVER['HTTP_REFERER'], '/admin/') || strstr($_SERVER['HTTP_REFERER'], '/system/')){
     // Get quantities
     $quantity = (int)$line_item->quantity;
     $old_quanity = (int)$line_item->original->quantity;
@@ -30,7 +30,7 @@ function bosa_stock_commerce_line_item_update($line_item){
 function bosa_stock_commerce_line_item_insert($line_item){
   // Only do stuff on admin pages
   // We dont want to mess up stock when the customer updates his cart
-  if(arg(0) == 'admin' || arg(0) == 'system'){
+  if(strstr($_SERVER['HTTP_REFERER'], '/admin/') || strstr($_SERVER['HTTP_REFERER'], '/system/')){
     // Get quantities
     $quantity = -(int)$line_item->quantity;
 
@@ -45,8 +45,7 @@ function bosa_stock_commerce_line_item_insert($line_item){
 function bosa_stock_commerce_line_item_delete($line_item){
   // Only do stuff on admin pages
   // We dont want to mess up stock when the customer updates his cart
-
-  if(arg(0) == 'admin'){
+  if(strstr($_SERVER['HTTP_REFERER'], '/admin/') || strstr($_SERVER['HTTP_REFERER'], '/system/')){
     // Get quantities
     $quantity = (int)$line_item->quantity;
 
